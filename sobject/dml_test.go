@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/namely/go-sfdc/v3"
-	"github.com/namely/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/v3"
+	"github.com/crochik/go-sfdc/v3/session"
 )
 
 type mockInserter struct {

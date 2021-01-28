@@ -8,7 +8,7 @@ This is a `golang` library for interfacing with `Salesforce` APIs.
 ### Installing
 To start using go-sfdc, install GO and run `go get`
 ```
-go get github.com/namely/go-sfdc/v3
+go get github.com/crochik/go-sfdc/v3
 ```
 This will retrieve the library.
 
@@ -36,8 +36,8 @@ The configuration defines several parameters that can be used by the library.  T
 package main
 
 import (
-	"github.com/namely/go-sfdc/v3"
-	"github.com/namely/go-sfdc/v3/credentials"
+	"github.com/crochik/go-sfdc/v3"
+	"github.com/crochik/go-sfdc/v3/credentials"
 )
 
 var config = sfdc.Configuration{
@@ -50,11 +50,11 @@ var config = sfdc.Configuration{
 ## License
 GO-SFDC source code is available under the [MIT License](LICENSE.txt)
 
-[godoc-img]: https://godoc.org/github.com/namely/go-sfdc?status.svg
-[godoc-url]: https://godoc.org/github.com/namely/go-sfdc
+[godoc-img]: https://godoc.org/github.com/crochik/go-sfdc?status.svg
+[godoc-url]: https://godoc.org/github.com/crochik/go-sfdc
 
-[ci-img]: https://github.com/namely/go-sfdc/workflows/CI/badge.svg
-[ci-url]: https://github.com/namely/go-sfdc/actions?query=workflow%3A%22CI%22
+[ci-img]: https://github.com/crochik/go-sfdc/workflows/CI/badge.svg
+[ci-url]: https://github.com/crochik/go-sfdc/actions?query=workflow%3A%22CI%22
 
-[codecov-img]: https://codecov.io/gh/namely/go-sfdc/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/namely/go-sfdc
+[codecov-img]: https://codecov.io/gh/crochik/go-sfdc/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/crochik/go-sfdc

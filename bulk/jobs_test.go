@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/namely/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/v3/session"
 )
 
 func TestJobs_do(t *testing.T) {

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/namely/go-sfdc/v3"
-	"github.com/namely/go-sfdc/v3/session"
-	"github.com/namely/go-sfdc/v3/sobject"
+	"github.com/crochik/go-sfdc/v3"
+	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/v3/sobject"
 )
 
 func Test_collection_send(t *testing.T) {

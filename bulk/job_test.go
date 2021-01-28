@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/namely/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/v3/session"
 )
 
 func TestJob_formatOptions(t *testing.T) {

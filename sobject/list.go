@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/namely/go-sfdc/v3"
-	"github.com/namely/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/v3"
+	"github.com/crochik/go-sfdc/v3/session"
 )
 
 // ListValue is a structure that is returned from Salesforce SObject list calls
