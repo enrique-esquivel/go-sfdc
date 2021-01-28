@@ -1,4 +1,4 @@
-module github.com/crochik/go-sfdc/v3
+module github.com/crochik/go-sfdc
 
 go 1.14
 
