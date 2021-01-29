@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/session"
 )
 
 type mockSessionFormatter struct {

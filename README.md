@@ -1,3 +1,6 @@
+___
+*THIS IS A FORK just to test. You should use one of the upstream repos instead.*
+___
 # go-sfdc
 
 [![Godoc Reference][godoc-img]][godoc-url] [![CI][ci-img]][ci-url] [![codecov][codecov-img]][codecov-url]
@@ -8,7 +11,7 @@ This is a `golang` library for interfacing with `Salesforce` APIs.
 ### Installing
 To start using go-sfdc, install GO and run `go get`
 ```
-go get github.com/crochik/go-sfdc/v3
+go get github.com/crochik/go-sfdc
 ```
 This will retrieve the library.
 
@@ -36,8 +39,8 @@ The configuration defines several parameters that can be used by the library.  T
 package main
 
 import (
-	"github.com/crochik/go-sfdc/v3"
-	"github.com/crochik/go-sfdc/v3/credentials"
+	"github.com/crochik/go-sfdc"
+	"github.com/crochik/go-sfdc/credentials"
 )
 
 var config = sfdc.Configuration{

@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/crochik/go-sfdc/v3"
-	"github.com/crochik/go-sfdc/v3/credentials"
+	"github.com/crochik/go-sfdc"
+	"github.com/crochik/go-sfdc/credentials"
 	"github.com/pkg/errors"
 )
 

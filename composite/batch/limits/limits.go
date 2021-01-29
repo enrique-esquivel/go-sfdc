@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/session"
 )
 
 // LimitRequest provides an batch subrequester that will fetch the current

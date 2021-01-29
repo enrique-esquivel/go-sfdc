@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/crochik/go-sfdc/v3"
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc"
+	"github.com/crochik/go-sfdc/session"
 )
 
 // Querier is the interface used to query a SObject from

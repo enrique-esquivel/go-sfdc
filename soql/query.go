@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/crochik/go-sfdc/v3"
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc"
+	"github.com/crochik/go-sfdc/session"
 	"github.com/pkg/errors"
 )
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/session"
 )
 
 type mockSubrequester struct {

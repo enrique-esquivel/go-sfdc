@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/crochik/go-sfdc/v3"
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc"
+	"github.com/crochik/go-sfdc/session"
 )
 
 // InsertValue is the value that is returned when a

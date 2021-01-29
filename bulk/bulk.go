@@ -1,7 +1,7 @@
 package bulk
 
 import (
-	"github.com/crochik/go-sfdc/v3/session"
+	"github.com/crochik/go-sfdc/session"
 	"github.com/pkg/errors"
 )
 

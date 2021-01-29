@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/crochik/go-sfdc/v3/session"
-	"github.com/crochik/go-sfdc/v3/sobject"
+	"github.com/crochik/go-sfdc/session"
+	"github.com/crochik/go-sfdc/sobject"
 )
 
 type mockQuery struct {
