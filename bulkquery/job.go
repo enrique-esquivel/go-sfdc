@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/crochik/go-sfdc"
 	"github.com/crochik/go-sfdc/session"
@@ -126,19 +129,15 @@ type QueryResponse struct {
 // QueryInfo is the response to the job information API.
 type QueryInfo struct {
 	QueryResponse
-	// ApexProcessingTime      int    `json:"apexProcessingTime"`
-	// APIActiveProcessingTime int    `json:"apiActiveProcessingTime"`
-	// NumberRecordsFailed     int    `json:"numberRecordsFailed"`
 	NumberRecordsProcessed int `json:"numberRecordsProcessed"`
 	Retries                int `json:"retries"`
 	TotalProcessingTime    int `json:"totalProcessingTime"`
-	// ErrorMessage            string `json:"errorMessage"`
 }
 
 // QueryJob is the bulk job.
 type QueryJob struct {
-	session session.ServiceFormatter
-	info    QueryResponse
+	session       session.ServiceFormatter
+	QueryResponse QueryResponse
 }
 
 func (j *QueryJob) create(options QueryOptions) error {
@@ -146,7 +145,7 @@ func (j *QueryJob) create(options QueryOptions) error {
 	if err != nil {
 		return err
 	}
-	j.info, err = j.createCallout(options)
+	j.QueryResponse, err = j.createCallout(options)
 	if err != nil {
 		return err
 	}
@@ -155,21 +154,27 @@ func (j *QueryJob) create(options QueryOptions) error {
 }
 
 func (j *QueryJob) formatOptions(options *QueryOptions) error {
-	if options.Operation == "" {
-		return errors.New("bulk job: operation is required")
-	}
 	if options.Query == "" {
 		return errors.New("bulk job: query is required")
 	}
+
+	// defaults
 	if options.LineEnding == "" {
 		options.LineEnding = Linefeed
 	}
+
 	if options.ContentType == "" {
 		options.ContentType = CSV
 	}
+
 	if options.ColumnDelimiter == "" {
 		options.ColumnDelimiter = Comma
 	}
+
+	if options.Operation == "" {
+		options.Operation = Query
+	}
+
 	return nil
 }
 
@@ -208,12 +213,67 @@ func (j *QueryJob) response(request *http.Request) (QueryResponse, error) {
 	if err != nil {
 		return QueryResponse{}, err
 	}
+
+	j.QueryResponse = value
+
 	return value, nil
+}
+
+// ExportResults exports the job results to a local file
+// returns the next locator (if more results are available)
+func (j *QueryJob) ExportResults(filepath string, maxRecords int, locator string) (string, error) {
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.QueryResponse.ID + "/results"
+	request, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	q := request.URL.Query()
+	if locator != "" {
+		q.Add("locator", locator)
+	}
+	if maxRecords > 0 {
+		q.Add("maxRecords", strconv.Itoa(maxRecords))
+	}
+
+	request.URL.RawQuery = q.Encode()
+
+	request.Header.Add("Accept", "text/csv")
+	request.Header.Add("Content-Type", "application/json")
+	j.session.AuthorizationHeader(request)
+
+	response, err := j.session.Client().Do(request)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		err := sfdc.HandleError(response)
+		return "", err
+	}
+
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return "", err
+	}
+
+	defer out.Close()
+
+	// Writer the body to file
+	_, err = io.Copy(out, response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	newLocator := response.Header.Get("Sforce-Locator")
+	return newLocator, nil
 }
 
 // Info returns the current job information.
 func (j *QueryJob) Info() (QueryInfo, error) {
-	return j.fetchInfo(j.info.ID)
+	return j.fetchInfo(j.QueryResponse.ID)
 }
 
 func (j *QueryJob) fetchInfo(id string) (QueryInfo, error) {
@@ -247,11 +307,14 @@ func (j *QueryJob) infoResponse(request *http.Request) (QueryInfo, error) {
 	if err != nil {
 		return QueryInfo{}, err
 	}
+
+	j.QueryResponse = value.QueryResponse
+
 	return value, nil
 }
 
 func (j *QueryJob) setState(state State) (QueryResponse, error) {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.QueryResponse.ID
 	jobState := struct {
 		State string `json:"state"`
 	}{
@@ -279,7 +342,7 @@ func (j *QueryJob) Abort() (QueryResponse, error) {
 
 // Delete will delete the current job.
 func (j *QueryJob) Delete() error {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.QueryResponse.ID
 	request, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		return err
@@ -321,7 +384,7 @@ func (j *QueryJob) record(fields, values []string) map[string]string {
 }
 
 func (j *QueryJob) delimiter() rune {
-	switch ColumnDelimiter(j.info.ColumnDelimiter) {
+	switch ColumnDelimiter(j.QueryResponse.ColumnDelimiter) {
 	case Tab:
 		return '\t'
 	case SemiColon:

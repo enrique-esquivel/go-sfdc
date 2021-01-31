@@ -271,7 +271,7 @@ func TestResource_AllJobs(t *testing.T) {
 				session: mockSession,
 				response: jobResponse{
 					Done: true,
-					Records: []Response{
+					Records: []WriteResponse{
 						{
 							APIVersion:          44.0,
 							ColumnDelimiter:     "COMMA",

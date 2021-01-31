@@ -146,8 +146,8 @@ type Options struct {
 	Operation           Operation       `json:"operation"`
 }
 
-// Response is the response to job APIs.
-type Response struct {
+// WriteResponse is the response to job APIs.
+type WriteResponse struct {
 	APIVersion          float32         `json:"apiVersion"`
 	ColumnDelimiter     ColumnDelimiter `json:"columnDelimiter"`
 	ConcurrencyMode     string          `json:"concurrencyMode"`
@@ -167,7 +167,7 @@ type Response struct {
 
 // Info is the response to the job information API.
 type Info struct {
-	Response
+	WriteResponse
 	ApexProcessingTime      int    `json:"apexProcessingTime"`
 	APIActiveProcessingTime int    `json:"apiActiveProcessingTime"`
 	NumberRecordsFailed     int    `json:"numberRecordsFailed"`
@@ -179,8 +179,8 @@ type Info struct {
 
 // Job is the bulk job.
 type Job struct {
-	session session.ServiceFormatter
-	info    Response
+	session       session.ServiceFormatter
+	WriteResponse WriteResponse
 }
 
 func (j *Job) create(options Options) error {
@@ -188,7 +188,7 @@ func (j *Job) create(options Options) error {
 	if err != nil {
 		return err
 	}
-	j.info, err = j.createCallout(options)
+	j.WriteResponse, err = j.createCallout(options)
 	if err != nil {
 		return err
 	}
@@ -220,15 +220,15 @@ func (j *Job) formatOptions(options *Options) error {
 	return nil
 }
 
-func (j *Job) createCallout(options Options) (Response, error) {
+func (j *Job) createCallout(options Options) (WriteResponse, error) {
 	url := j.session.ServiceURL() + bulk2Endpoint
 	body, err := json.Marshal(options)
 	if err != nil {
-		return Response{}, err
+		return WriteResponse{}, err
 	}
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
-		return Response{}, err
+		return WriteResponse{}, err
 	}
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/json")
@@ -237,30 +237,30 @@ func (j *Job) createCallout(options Options) (Response, error) {
 	return j.response(request)
 }
 
-func (j *Job) response(request *http.Request) (Response, error) {
+func (j *Job) response(request *http.Request) (WriteResponse, error) {
 	response, err := j.session.Client().Do(request)
 	if err != nil {
-		return Response{}, err
+		return WriteResponse{}, err
 	}
 
 	decoder := json.NewDecoder(response.Body)
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return Response{}, sfdc.HandleError(response)
+		return WriteResponse{}, sfdc.HandleError(response)
 	}
 
-	var value Response
+	var value WriteResponse
 	err = decoder.Decode(&value)
 	if err != nil {
-		return Response{}, err
+		return WriteResponse{}, err
 	}
 	return value, nil
 }
 
 // Info returns the current job information.
 func (j *Job) Info() (Info, error) {
-	return j.fetchInfo(j.info.ID)
+	return j.fetchInfo(j.WriteResponse.ID)
 }
 
 func (j *Job) fetchInfo(id string) (Info, error) {
@@ -297,8 +297,8 @@ func (j *Job) infoResponse(request *http.Request) (Info, error) {
 	return value, nil
 }
 
-func (j *Job) setState(state State) (Response, error) {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID
+func (j *Job) setState(state State) (WriteResponse, error) {
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID
 	jobState := struct {
 		State string `json:"state"`
 	}{
@@ -306,11 +306,11 @@ func (j *Job) setState(state State) (Response, error) {
 	}
 	body, err := json.Marshal(jobState)
 	if err != nil {
-		return Response{}, err
+		return WriteResponse{}, err
 	}
 	request, err := http.NewRequest(http.MethodPatch, url, bytes.NewReader(body))
 	if err != nil {
-		return Response{}, err
+		return WriteResponse{}, err
 	}
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/json")
@@ -320,18 +320,18 @@ func (j *Job) setState(state State) (Response, error) {
 }
 
 // Close will close the current job.
-func (j *Job) Close() (Response, error) {
+func (j *Job) Close() (WriteResponse, error) {
 	return j.setState(UpdateComplete)
 }
 
 // Abort will abort the current job.
-func (j *Job) Abort() (Response, error) {
+func (j *Job) Abort() (WriteResponse, error) {
 	return j.setState(Aborted)
 }
 
 // Delete will delete the current job.
 func (j *Job) Delete() error {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID
 	request, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		return err
@@ -351,7 +351,7 @@ func (j *Job) Delete() error {
 
 // Upload will upload data to processing.
 func (j *Job) Upload(body io.Reader) error {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID + "/batches"
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID + "/batches"
 	request, err := http.NewRequest(http.MethodPut, url, body)
 	if err != nil {
 		return err
@@ -373,7 +373,7 @@ func (j *Job) Upload(body io.Reader) error {
 
 // SuccessfulRecords returns the successful records for the job.
 func (j *Job) SuccessfulRecords() ([]SuccessfulRecord, error) {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID + "/successfulResults/"
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID + "/successfulResults/"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -423,7 +423,7 @@ func (j *Job) SuccessfulRecords() ([]SuccessfulRecord, error) {
 
 // FailedRecords returns the failed records for the job.
 func (j *Job) FailedRecords() ([]FailedRecord, error) {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID + "/failedResults/"
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID + "/failedResults/"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -469,7 +469,7 @@ func (j *Job) FailedRecords() ([]FailedRecord, error) {
 
 // UnprocessedRecords returns the unprocessed records for the job.
 func (j *Job) UnprocessedRecords() ([]UnprocessedRecord, error) {
-	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.info.ID + "/unprocessedrecords/"
+	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID + "/unprocessedrecords/"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -535,7 +535,7 @@ func (j *Job) record(fields, values []string) map[string]string {
 }
 
 func (j *Job) delimiter() rune {
-	switch ColumnDelimiter(j.info.ColumnDelimiter) {
+	switch ColumnDelimiter(j.WriteResponse.ColumnDelimiter) {
 	case Tab:
 		return '\t'
 	case SemiColon:

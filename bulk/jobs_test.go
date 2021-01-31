@@ -67,7 +67,7 @@ func TestJobs_do(t *testing.T) {
 			},
 			want: jobResponse{
 				Done: true,
-				Records: []Response{
+				Records: []WriteResponse{
 					{
 						APIVersion:          44.0,
 						ColumnDelimiter:     "COMMA",
@@ -202,7 +202,7 @@ func Test_newJobs(t *testing.T) {
 				session: mockSession,
 				response: jobResponse{
 					Done: true,
-					Records: []Response{
+					Records: []WriteResponse{
 						{
 							APIVersion:          44.0,
 							ColumnDelimiter:     "COMMA",
@@ -281,13 +281,13 @@ func TestJobs_Records(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		want   []Response
+		want   []WriteResponse
 	}{
 		{
 			name: "Passing",
 			fields: fields{
 				response: jobResponse{
-					Records: []Response{
+					Records: []WriteResponse{
 						{
 							APIVersion:          44.0,
 							ColumnDelimiter:     "COMMA",
@@ -308,7 +308,7 @@ func TestJobs_Records(t *testing.T) {
 					},
 				},
 			},
-			want: []Response{
+			want: []WriteResponse{
 				{
 					APIVersion:          44.0,
 					ColumnDelimiter:     "COMMA",
@@ -408,7 +408,7 @@ func TestJobs_Next(t *testing.T) {
 				session: mockSession,
 				response: jobResponse{
 					Done: true,
-					Records: []Response{
+					Records: []WriteResponse{
 						{
 							APIVersion:          44.0,
 							ColumnDelimiter:     "COMMA",

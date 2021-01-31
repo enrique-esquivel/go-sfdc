@@ -29,6 +29,10 @@ func NewResource(session session.ServiceFormatter) (*Resource, error) {
 	}, nil
 }
 
+func (r *Resource) String() string {
+	return "Bulk(Query)"
+}
+
 // CreateJob will create a new bulk 2.0 job from the options that where passed.
 // The Job that is returned can be used to upload object data to the Salesforce org.
 func (r *Resource) CreateJob(options QueryOptions) (*QueryJob, error) {
@@ -51,7 +55,7 @@ func (r *Resource) GetJob(id string) (*QueryJob, error) {
 	if err != nil {
 		return nil, err
 	}
-	job.info = info.QueryResponse
+	job.QueryResponse = info.QueryResponse
 
 	return job, nil
 }

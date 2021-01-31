@@ -14,7 +14,7 @@ import (
 func TestJob_formatOptions(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		options *Options
@@ -109,8 +109,8 @@ func TestJob_formatOptions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			err := j.formatOptions(tt.args.options)
 			if (err != nil) != tt.wantErr {
@@ -127,7 +127,7 @@ func TestJob_formatOptions(t *testing.T) {
 func TestJob_delimiter(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	tests := []struct {
 		name   string
@@ -137,7 +137,7 @@ func TestJob_delimiter(t *testing.T) {
 		{
 			name: "tab",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ColumnDelimiter: "TAB",
 				},
 			},
@@ -146,7 +146,7 @@ func TestJob_delimiter(t *testing.T) {
 		{
 			name: "back quote",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ColumnDelimiter: "BACKQUOTE",
 				},
 			},
@@ -155,7 +155,7 @@ func TestJob_delimiter(t *testing.T) {
 		{
 			name: "caret",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ColumnDelimiter: "CARET",
 				},
 			},
@@ -164,7 +164,7 @@ func TestJob_delimiter(t *testing.T) {
 		{
 			name: "comma",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ColumnDelimiter: "COMMA",
 				},
 			},
@@ -173,7 +173,7 @@ func TestJob_delimiter(t *testing.T) {
 		{
 			name: "pipe",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ColumnDelimiter: "PIPE",
 				},
 			},
@@ -182,7 +182,7 @@ func TestJob_delimiter(t *testing.T) {
 		{
 			name: "semi colon",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ColumnDelimiter: "SEMICOLON",
 				},
 			},
@@ -192,8 +192,8 @@ func TestJob_delimiter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			if got := j.delimiter(); got != tt.want {
 				t.Errorf("Job.delimiter() = %v, want %v", got, tt.want)
@@ -205,7 +205,7 @@ func TestJob_delimiter(t *testing.T) {
 func TestJob_record(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		fields []string
@@ -242,8 +242,8 @@ func TestJob_record(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			if got := j.record(tt.args.fields, tt.args.values); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Job.record() = %v, want %v", got, tt.want)
@@ -255,7 +255,7 @@ func TestJob_record(t *testing.T) {
 func TestJob_fields(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		columns []string
@@ -284,8 +284,8 @@ func TestJob_fields(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got := j.fields(tt.args.columns, tt.args.offset)
 			if !reflect.DeepEqual(got, tt.want) {
@@ -302,7 +302,7 @@ func testNewRequest() *http.Request {
 func TestJob_response(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		request *http.Request
@@ -311,7 +311,7 @@ func TestJob_response(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    Response
+		want    WriteResponse
 		wantErr bool
 	}{
 		{
@@ -349,7 +349,7 @@ func TestJob_response(t *testing.T) {
 			args: args{
 				request: testNewRequest(),
 			},
-			want: Response{
+			want: WriteResponse{
 				APIVersion:          44.0,
 				ColumnDelimiter:     "COMMA",
 				ConcurrencyMode:     "Parallel",
@@ -392,15 +392,15 @@ func TestJob_response(t *testing.T) {
 			args: args{
 				request: testNewRequest(),
 			},
-			want:    Response{},
+			want:    WriteResponse{},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.response(tt.args.request)
 			if (err != nil) != tt.wantErr {
@@ -417,7 +417,7 @@ func TestJob_response(t *testing.T) {
 func TestJob_createCallout(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		options Options
@@ -426,7 +426,7 @@ func TestJob_createCallout(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    Response
+		want    WriteResponse
 		wantErr bool
 	}{
 		{
@@ -481,7 +481,7 @@ func TestJob_createCallout(t *testing.T) {
 					Operation:           Insert,
 				},
 			},
-			want: Response{
+			want: WriteResponse{
 				APIVersion:          44.0,
 				ColumnDelimiter:     "COMMA",
 				ConcurrencyMode:     "Parallel",
@@ -504,8 +504,8 @@ func TestJob_createCallout(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.createCallout(tt.args.options)
 			if (err != nil) != tt.wantErr {
@@ -522,7 +522,7 @@ func TestJob_createCallout(t *testing.T) {
 func TestJob_create(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		options Options
@@ -591,8 +591,8 @@ func TestJob_create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			if err := j.create(tt.args.options); (err != nil) != tt.wantErr {
 				t.Errorf("Job.create() error = %v, wantErr %v", err, tt.wantErr)
@@ -604,7 +604,7 @@ func TestJob_create(t *testing.T) {
 func TestJob_setState(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		state State
@@ -613,13 +613,13 @@ func TestJob_setState(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    Response
+		want    WriteResponse
 		wantErr bool
 	}{
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID: "1234",
 				},
 				session: &mockSessionFormatter{
@@ -672,7 +672,7 @@ func TestJob_setState(t *testing.T) {
 			args: args{
 				state: UpdateComplete,
 			},
-			want: Response{
+			want: WriteResponse{
 				APIVersion:          44.0,
 				ColumnDelimiter:     "COMMA",
 				ConcurrencyMode:     "Parallel",
@@ -694,7 +694,7 @@ func TestJob_setState(t *testing.T) {
 		{
 			name: "failing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID: "1234",
 				},
 				session: &mockSessionFormatter{
@@ -736,15 +736,15 @@ func TestJob_setState(t *testing.T) {
 			args: args{
 				state: UpdateComplete,
 			},
-			want:    Response{},
+			want:    WriteResponse{},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.setState(tt.args.state)
 			if (err != nil) != tt.wantErr {
@@ -761,7 +761,7 @@ func TestJob_setState(t *testing.T) {
 func TestJob_infoResponse(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		request *http.Request
@@ -816,7 +816,7 @@ func TestJob_infoResponse(t *testing.T) {
 				request: testNewRequest(),
 			},
 			want: Info{
-				Response: Response{
+				WriteResponse: WriteResponse{
 					APIVersion:          44.0,
 					ColumnDelimiter:     "COMMA",
 					ConcurrencyMode:     "Parallel",
@@ -874,8 +874,8 @@ func TestJob_infoResponse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.infoResponse(tt.args.request)
 			if (err != nil) != tt.wantErr {
@@ -892,7 +892,7 @@ func TestJob_infoResponse(t *testing.T) {
 func TestJob_Info(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	tests := []struct {
 		name    string
@@ -903,7 +903,7 @@ func TestJob_Info(t *testing.T) {
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID: "1234",
 				},
 				session: &mockSessionFormatter{
@@ -962,7 +962,7 @@ func TestJob_Info(t *testing.T) {
 				},
 			},
 			want: Info{
-				Response: Response{
+				WriteResponse: WriteResponse{
 					APIVersion:          44.0,
 					ColumnDelimiter:     "COMMA",
 					ConcurrencyMode:     "Parallel",
@@ -993,8 +993,8 @@ func TestJob_Info(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.Info()
 			if (err != nil) != tt.wantErr {
@@ -1011,7 +1011,7 @@ func TestJob_Info(t *testing.T) {
 func TestJob_Delete(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	tests := []struct {
 		name    string
@@ -1021,7 +1021,7 @@ func TestJob_Delete(t *testing.T) {
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID: "1234",
 				},
 				session: &mockSessionFormatter{
@@ -1060,7 +1060,7 @@ func TestJob_Delete(t *testing.T) {
 		{
 			name: "Fail",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID: "1234",
 				},
 				session: &mockSessionFormatter{
@@ -1100,8 +1100,8 @@ func TestJob_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			if err := j.Delete(); (err != nil) != tt.wantErr {
 				t.Errorf("Job.Delete() error = %v, wantErr %v", err, tt.wantErr)
@@ -1113,7 +1113,7 @@ func TestJob_Delete(t *testing.T) {
 func TestJob_Upload(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	type args struct {
 		body io.Reader
@@ -1127,7 +1127,7 @@ func TestJob_Upload(t *testing.T) {
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID: "1234",
 				},
 				session: &mockSessionFormatter{
@@ -1170,8 +1170,8 @@ func TestJob_Upload(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			if err := j.Upload(tt.args.body); (err != nil) != tt.wantErr {
 				t.Errorf("Job.Upload() error = %v, wantErr %v", err, tt.wantErr)
@@ -1183,7 +1183,7 @@ func TestJob_Upload(t *testing.T) {
 func TestJob_SuccessfulRecords(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	tests := []struct {
 		name    string
@@ -1194,7 +1194,7 @@ func TestJob_SuccessfulRecords(t *testing.T) {
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID:              "1234",
 					ColumnDelimiter: Pipe,
 					LineEnding:      Linefeed,
@@ -1265,8 +1265,8 @@ func TestJob_SuccessfulRecords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.SuccessfulRecords()
 			if (err != nil) != tt.wantErr {
@@ -1283,7 +1283,7 @@ func TestJob_SuccessfulRecords(t *testing.T) {
 func TestJob_FailedRecords(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	tests := []struct {
 		name    string
@@ -1294,7 +1294,7 @@ func TestJob_FailedRecords(t *testing.T) {
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID:              "1234",
 					ColumnDelimiter: Pipe,
 					LineEnding:      Linefeed,
@@ -1363,8 +1363,8 @@ func TestJob_FailedRecords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.FailedRecords()
 			if (err != nil) != tt.wantErr {
@@ -1381,7 +1381,7 @@ func TestJob_FailedRecords(t *testing.T) {
 func TestJob_UnprocessedRecords(t *testing.T) {
 	type fields struct {
 		session session.ServiceFormatter
-		info    Response
+		info    WriteResponse
 	}
 	tests := []struct {
 		name    string
@@ -1392,7 +1392,7 @@ func TestJob_UnprocessedRecords(t *testing.T) {
 		{
 			name: "Passing",
 			fields: fields{
-				info: Response{
+				info: WriteResponse{
 					ID:              "1234",
 					ColumnDelimiter: Pipe,
 					LineEnding:      Linefeed,
@@ -1451,8 +1451,8 @@ func TestJob_UnprocessedRecords(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			j := &Job{
-				session: tt.fields.session,
-				info:    tt.fields.info,
+				session:       tt.fields.session,
+				WriteResponse: tt.fields.info,
 			}
 			got, err := j.UnprocessedRecords()
 			if (err != nil) != tt.wantErr {

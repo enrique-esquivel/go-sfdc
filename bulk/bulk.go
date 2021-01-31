@@ -51,7 +51,7 @@ func (r *Resource) GetJob(id string) (*Job, error) {
 	if err != nil {
 		return nil, err
 	}
-	job.info = info.Response
+	job.WriteResponse = info.WriteResponse
 
 	return job, nil
 }

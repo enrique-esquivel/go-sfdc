@@ -22,9 +22,9 @@ type Parameters struct {
 }
 
 type jobResponse struct {
-	Done           bool       `json:"done"`
-	Records        []Response `json:"records"`
-	NextRecordsURL string     `json:"nextRecordsUrl"`
+	Done           bool            `json:"done"`
+	Records        []WriteResponse `json:"records"`
+	NextRecordsURL string          `json:"nextRecordsUrl"`
 }
 
 // Jobs presents the response from the all jobs request.
@@ -61,7 +61,7 @@ func (j *Jobs) Done() bool {
 }
 
 // Records contains the information for each retrieved job.
-func (j *Jobs) Records() []Response {
+func (j *Jobs) Records() []WriteResponse {
 	return j.response.Records
 }
 

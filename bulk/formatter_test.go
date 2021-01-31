@@ -22,7 +22,7 @@ func TestNewFormatter(t *testing.T) {
 			name: "Passing",
 			args: args{
 				job: &Job{
-					info: Response{
+					WriteResponse: WriteResponse{
 						ColumnDelimiter: Pipe,
 						LineEnding:      Linefeed,
 					},
@@ -34,7 +34,7 @@ func TestNewFormatter(t *testing.T) {
 			},
 			want: &Formatter{
 				job: &Job{
-					info: Response{
+					WriteResponse: WriteResponse{
 						ColumnDelimiter: Pipe,
 						LineEnding:      Linefeed,
 					},
@@ -63,7 +63,7 @@ func TestNewFormatter(t *testing.T) {
 			name: "No Fields",
 			args: args{
 				job: &Job{
-					info: Response{
+					WriteResponse: WriteResponse{
 						ColumnDelimiter: Pipe,
 						LineEnding:      Linefeed,
 					},
@@ -126,7 +126,7 @@ func TestFormatter_Add(t *testing.T) {
 			name: "Adding",
 			fields: fields{
 				job: &Job{
-					info: Response{
+					WriteResponse: WriteResponse{
 						ColumnDelimiter: Pipe,
 						LineEnding:      Linefeed,
 					},
@@ -161,7 +161,7 @@ func TestFormatter_Add(t *testing.T) {
 			name: "Adding",
 			fields: fields{
 				job: &Job{
-					info: Response{
+					WriteResponse: WriteResponse{
 						ColumnDelimiter: Pipe,
 						LineEnding:      Linefeed,
 					},
