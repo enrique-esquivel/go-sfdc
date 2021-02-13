@@ -219,21 +219,27 @@ func (j *QueryJob) response(request *http.Request) (QueryResponse, error) {
 	return value, nil
 }
 
-// ExportResults exports the job results to a local file
-// returns the next locator (if more results are available)
-func (j *QueryJob) ExportResults(filepath string, maxRecords int, locator string) (string, error) {
+// ExportInfo configure export
+type ExportInfo struct {
+	Writer     io.Writer
+	MaxRecords int
+	Locator    string
+}
+
+// Export exports results of query job
+func (j *QueryJob) Export(i ExportInfo) error {
 	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.QueryResponse.ID + "/results"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	q := request.URL.Query()
-	if locator != "" {
-		q.Add("locator", locator)
+	if i.Locator != "" {
+		q.Add("locator", i.Locator)
 	}
-	if maxRecords > 0 {
-		q.Add("maxRecords", strconv.Itoa(maxRecords))
+	if i.MaxRecords > 0 {
+		q.Add("maxRecords", strconv.Itoa(i.MaxRecords))
 	}
 
 	request.URL.RawQuery = q.Encode()
@@ -244,15 +250,28 @@ func (j *QueryJob) ExportResults(filepath string, maxRecords int, locator string
 
 	response, err := j.session.Client().Do(request)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		err := sfdc.HandleError(response)
-		return "", err
+		return err
 	}
 
+	// Writer the body to file
+	_, err = io.Copy(i.Writer, response.Body)
+	if err != nil {
+		return err
+	}
+
+	i.Locator = response.Header.Get("Sforce-Locator")
+	return nil
+}
+
+// ExportResults exports the job results to a local file
+// returns the next locator (if more results are available)
+func (j *QueryJob) ExportResults(filepath string, maxRecords int, locator string) (string, error) {
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
@@ -261,14 +280,17 @@ func (j *QueryJob) ExportResults(filepath string, maxRecords int, locator string
 
 	defer out.Close()
 
-	// Writer the body to file
-	_, err = io.Copy(out, response.Body)
-	if err != nil {
+	info := ExportInfo{
+		Writer:     out,
+		MaxRecords: maxRecords,
+		Locator:    locator,
+	}
+
+	if err := j.Export(info); err != nil {
 		return "", err
 	}
 
-	newLocator := response.Header.Get("Sforce-Locator")
-	return newLocator, nil
+	return info.Locator, nil
 }
 
 // Info returns the current job information.
