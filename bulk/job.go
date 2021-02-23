@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/crochik/go-sfdc"
@@ -371,8 +372,7 @@ func (j *Job) Upload(body io.Reader) error {
 	return nil
 }
 
-// SuccessfulRecords returns the successful records for the job.
-func (j *Job) SuccessfulRecords() ([]SuccessfulRecord, error) {
+func (j *Job) getSuccessfulResults() (*http.Response, error) {
 	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID + "/successfulResults/"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -385,13 +385,29 @@ func (j *Job) SuccessfulRecords() ([]SuccessfulRecord, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
 		return nil, sfdc.HandleError(response)
 	}
 
-	reader := csv.NewReader(response.Body)
+	return response, nil
+}
+
+// ReadSuccessfulResults read job results from local file
+func (j *Job) ReadSuccessfulResults(filename string) ([]SuccessfulRecord, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return j.ParseSuccessfulResults(f)
+}
+
+// ParseSuccessfulResults parse results of operation
+func (j *Job) ParseSuccessfulResults(stream io.Reader) ([]SuccessfulRecord, error) {
+	reader := csv.NewReader(stream)
 	reader.Comma = j.delimiter()
 
 	var records []SuccessfulRecord
@@ -421,8 +437,38 @@ func (j *Job) SuccessfulRecords() ([]SuccessfulRecord, error) {
 	return records, nil
 }
 
-// FailedRecords returns the failed records for the job.
-func (j *Job) FailedRecords() ([]FailedRecord, error) {
+// SuccessfulRecords returns the successful records for the job.
+func (j *Job) SuccessfulRecords() ([]SuccessfulRecord, error) {
+	response, err := j.getSuccessfulResults()
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+	return j.ParseSuccessfulResults(response.Body)
+}
+
+// ExportSuccessfulResults export failed results to file.
+func (j *Job) ExportSuccessfulResults(filename string) error {
+	response, err := j.getSuccessfulResults()
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	out, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, response.Body)
+	return err
+}
+
+func (j *Job) getFailedResults() (*http.Response, error) {
 	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.WriteResponse.ID + "/failedResults/"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -435,13 +481,49 @@ func (j *Job) FailedRecords() ([]FailedRecord, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
 		return nil, sfdc.HandleError(response)
 	}
 
-	reader := csv.NewReader(response.Body)
+	return response, nil
+}
+
+// ExportFailedResults export failed results to file.
+func (j *Job) ExportFailedResults(filename string) error {
+	response, err := j.getFailedResults()
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	out, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, response.Body)
+	return err
+}
+
+// ReadFailedResults read job results from local file
+func (j *Job) ReadFailedResults(filename string) ([]FailedRecord, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return j.ParseFailedResults(f)
+}
+
+// ParseFailedResults parse response from failedresults
+func (j *Job) ParseFailedResults(stream io.Reader) ([]FailedRecord, error) {
+	reader := csv.NewReader(stream)
 	reader.Comma = j.delimiter()
 
 	var records []FailedRecord
@@ -465,6 +547,18 @@ func (j *Job) FailedRecords() ([]FailedRecord, error) {
 	}
 
 	return records, nil
+}
+
+// FailedRecords returns the failed records for the job.
+func (j *Job) FailedRecords() ([]FailedRecord, error) {
+	response, err := j.getFailedResults()
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+
+	return j.ParseFailedResults(response.Body)
 }
 
 // UnprocessedRecords returns the unprocessed records for the job.
