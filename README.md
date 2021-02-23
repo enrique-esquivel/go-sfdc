@@ -1,5 +1,5 @@
 ___
-*THIS IS A FORK just to test. You should use one of the upstream repos instead.*
+*THIS IS A FORK only for testing. You should use one of the upstream repos instead.*
 ___
 # go-sfdc
 
