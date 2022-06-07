@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/crochik/go-sfdc/credentials"
+	"github.com/enrique-esquivel/go-sfdc/credentials"
 )
 
 // Configuration is the structure for goforce sessions.
