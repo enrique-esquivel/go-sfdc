@@ -1,4 +1,4 @@
-module github.com/crochik/go-sfdc
+module github.com/enrique-esquivel/go-sfdc
 
 go 1.15
 
