@@ -68,6 +68,8 @@ const (
 	Insert Operation = "insert"
 	// Delete is the object operation for deleting records.
 	Delete Operation = "delete"
+	// Hard Delete is the object operation for hard deleting records.
+	HardDelete Operation = "hardDelete"
 	// Update is the object operation for updating records.
 	Update Operation = "update"
 	// Upsert is the object operation for upserting records.
