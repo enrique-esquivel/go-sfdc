@@ -227,7 +227,7 @@ type ExportInfo struct {
 }
 
 // Export exports results of query job
-func (j *QueryJob) Export(i ExportInfo) error {
+func (j *QueryJob) Export(i *ExportInfo) error {
 	url := j.session.ServiceURL() + bulk2Endpoint + "/" + j.QueryResponse.ID + "/results"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -286,7 +286,7 @@ func (j *QueryJob) ExportResults(filepath string, maxRecords int, locator string
 		Locator:    locator,
 	}
 
-	if err := j.Export(info); err != nil {
+	if err := j.Export(&info); err != nil {
 		return "", err
 	}
 
