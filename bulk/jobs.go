@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/crochik/go-sfdc"
-	"github.com/crochik/go-sfdc/session"
+	"github.com/enrique-esquivel/go-sfdc"
+	"github.com/enrique-esquivel/go-sfdc/session"
 )
 
 // Parameters to query all of the bulk jobs.

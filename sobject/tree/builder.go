@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/crochik/go-sfdc/sobject"
+	"github.com/enrique-esquivel/go-sfdc/sobject"
 )
 
 // Builder is the SObject Tree builder for the

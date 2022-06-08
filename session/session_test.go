@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crochik/go-sfdc"
-	"github.com/crochik/go-sfdc/credentials"
+	"github.com/enrique-esquivel/go-sfdc"
+	"github.com/enrique-esquivel/go-sfdc/credentials"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

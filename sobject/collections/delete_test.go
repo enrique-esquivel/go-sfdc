@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/crochik/go-sfdc"
-	"github.com/crochik/go-sfdc/session"
-	"github.com/crochik/go-sfdc/sobject"
+	"github.com/enrique-esquivel/go-sfdc"
+	"github.com/enrique-esquivel/go-sfdc/session"
+	"github.com/enrique-esquivel/go-sfdc/sobject"
 )
 
 func TestDelete_values(t *testing.T) {

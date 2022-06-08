@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/crochik/go-sfdc/session"
-	"github.com/crochik/go-sfdc/sobject"
+	"github.com/enrique-esquivel/go-sfdc/session"
+	"github.com/enrique-esquivel/go-sfdc/sobject"
 )
 
 // DeleteValue is the return value from the

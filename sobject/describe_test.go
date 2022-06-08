@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/crochik/go-sfdc/session"
+	"github.com/enrique-esquivel/go-sfdc/session"
 )
 
 func Test_describe_Describe(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/crochik/go-sfdc"
-	"github.com/crochik/go-sfdc/session"
+	"github.com/enrique-esquivel/go-sfdc"
+	"github.com/enrique-esquivel/go-sfdc/session"
 	"github.com/pkg/errors"
 )
 
