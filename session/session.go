@@ -59,6 +59,12 @@ type ServiceFormatter interface {
 	ServiceURL() string
 }
 
+type AsyncServiceFormatter interface {
+	ServiceFormatter
+	// AsyncServiceURL will return the Salesforce instance for the async service URL.
+	AsyncServiceURL() string
+}
+
 type sessionPasswordResponse struct {
 	AccessToken string `json:"access_token"`
 	InstanceURL string `json:"instance_url"`
@@ -160,6 +166,15 @@ func (s *Session) ServiceURL() string {
 	defer s.mu.RUnlock()
 
 	return fmt.Sprintf("%s/services/data/v%d.0", s.response.InstanceURL, s.config.Version)
+}
+
+// AsyncServiceURL will return the Salesforce instance for the
+// async service URL.
+func (s *Session) AsyncServiceURL() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return fmt.Sprintf("%s/services/async/v%d.0", s.response.InstanceURL, s.config.Version)
 }
 
 // AuthorizationHeader will add the authorization to the
