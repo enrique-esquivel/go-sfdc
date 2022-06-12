@@ -1,4 +1,4 @@
-package bulk
+package bulkv1
 
 import (
 	"bytes"
