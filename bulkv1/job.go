@@ -173,7 +173,7 @@ type Job struct {
 	Response JobInfo
 }
 
-func (j *Job) create(options Options, header HeaderOptions) error {
+func (j *Job) Create(options Options, header HeaderOptions) error {
 	err := j.formatOptions(options, &header)
 	if err != nil {
 		return err
@@ -253,7 +253,7 @@ func (j *Job) response(request *http.Request) (JobInfo, error) {
 	return value, nil
 }
 
-func (j *Job) createBatch(body io.Reader) (BatchInfo, error) {
+func (j *Job) CreateBatch(body io.Reader) (BatchInfo, error) {
 	url := j.session.AsyncServiceURL() + bulkEndpoint + "/" + j.Response.ID + "/batch"
 	request, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
@@ -370,7 +370,7 @@ func (j *Job) Delete() error {
 	return nil
 }
 
-func (j *Job) getResults(batchInfo BatchInfo) (*http.Response, error) {
+func (j *Job) BatchResult(batchInfo BatchInfo) (*http.Response, error) {
 	url := j.session.ServiceURL() + bulkEndpoint + "/" + j.Response.ID + "/batch/" + batchInfo.ID + "/result"
 	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -394,7 +394,7 @@ func (j *Job) getResults(batchInfo BatchInfo) (*http.Response, error) {
 
 // ExportSuccessfulResults export failed results to file.
 func (j *Job) ExportResults(filename string, batchInfo BatchInfo) error {
-	response, err := j.getResults(batchInfo)
+	response, err := j.BatchResult(batchInfo)
 	if err != nil {
 		return err
 	}
